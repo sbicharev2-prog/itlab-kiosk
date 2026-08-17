@@ -711,6 +711,13 @@
         <nav class="nav">
 
             <button
+    class="danger-button"
+    id="exitAppBtn"
+>
+    ⏻ Полностью закрыть приложение
+</button>
+
+            <button
                 class="active"
                 data-section="home"
             >
@@ -3194,6 +3201,45 @@
 
     initialize();
 
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const button =
+        document.getElementById('exitAppBtn');
+
+    if (!button) {
+        console.error('exitAppBtn not found');
+        return;
+    }
+
+    button.addEventListener('click', async () => {
+
+        const confirmed = confirm(
+            'Полностью закрыть приложение?'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        console.log('EXIT CONFIRMED');
+
+        try {
+
+            await window.electronAPI.exitApp();
+
+        } catch (error) {
+
+            console.error(
+                'EXIT ERROR:',
+                error
+            );
+        }
+    });
+
+});
 </script>
 
 </body>

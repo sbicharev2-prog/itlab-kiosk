@@ -7,6 +7,10 @@ contextBridge.exposeInMainWorld(
     'electronAPI',
     {
 
+        exitApp: () => {
+            return ipcRenderer.invoke('admin-exit-app');
+        },
+
         // ====================================================
         // RESTART KIOSK
         // ====================================================
@@ -18,6 +22,7 @@ contextBridge.exposeInMainWorld(
             );
         },
 
+        
         // ====================================================
         // PIN / ADMIN
         // ====================================================

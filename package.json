@@ -1,7 +1,7 @@
 {
   "name": "itlab-kiosk",
   "productName": "ITLab Store Kiosk",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "ITLab Store Kiosk Application",
   "main": "main.js",
   "author": {

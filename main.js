@@ -3,7 +3,7 @@ const {
     BrowserWindow,
     globalShortcut,
     ipcMain,
-    session
+    screen
 } = require('electron');
 
 const {
@@ -13,9 +13,38 @@ const {
 const https = require('https');
 const http = require('http');
 const path = require('path');
+const { exec } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const crypto = require('crypto');
+
+// ============================================================
+// WINDOWS TASKBAR CONTROL
+// ============================================================
+
+function hideWindowsTaskbar() {
+
+    if (process.platform !== 'win32') {
+        return;
+    }
+
+    exec(
+        `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$code = '[DllImport(\\\"user32.dll\\\")] public static extern IntPtr FindWindow(string lpClassName, string lpWindowName); [DllImport(\\\"user32.dll\\\")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'; Add-Type -MemberDefinition $code -Name Win32 -Namespace Taskbar; $h = [Taskbar.Win32]::FindWindow('Shell_TrayWnd', ''); if ($h -ne [IntPtr]::Zero) { [Taskbar.Win32]::ShowWindow($h, 0) }"`,
+        () => {}
+    );
+}
+
+function showWindowsTaskbar() {
+
+    if (process.platform !== 'win32') {
+        return;
+    }
+
+    exec(
+        `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$code = '[DllImport(\\\"user32.dll\\\")] public static extern IntPtr FindWindow(string lpClassName, string lpWindowName); [DllImport(\\\"user32.dll\\\")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'; Add-Type -MemberDefinition $code -Name Win32 -Namespace Taskbar; $h = [Taskbar.Win32]::FindWindow('Shell_TrayWnd', ''); if ($h -ne [IntPtr]::Zero) { [Taskbar.Win32]::ShowWindow($h, 5) }"`,
+        () => {}
+    );
+}
 
 // ============================================================
 // НАСТРОЙКИ
@@ -1676,30 +1705,96 @@ async function handleRemoteRequest(
 
 function createWindow() {
 
-    win =
-        new BrowserWindow({
+        if (process.platform === 'win32') {
+        exec(
+            'powershell.exe -NoProfile -Command "Get-Process explorer -ErrorAction SilentlyContinue | Out-Null"',
+            () => {}
+        );
+    }
 
-            width: 1280,
-            height: 720,
+    win = new BrowserWindow({
 
-            fullscreen: true,
-            kiosk: true,
+        width: 1920,
+        height: 1080,
 
-            resizable: false,
+        fullscreen: true,
+        kiosk: true,
 
-            autoHideMenuBar: true,
+        frame: false,
+        resizable: false,
+        movable: false,
+        minimizable: false,
+        maximizable: false,
+        closable: false,
 
-            webPreferences: {
+        autoHideMenuBar: true,
+        fullscreenable: true,
 
-                contextIsolation: true,
-                nodeIntegration: false
-            }
-        });
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false
+        }
+    });
+
+    // ============================================================
+    // WINDOWS KIOSK
+    // ============================================================
+
+    if (process.platform === 'win32') {
+
+        win.setMenuBarVisibility(false);
+        win.setResizable(false);
+
+        win.setFullScreen(true);
+        win.setKiosk(true);
+
+        win.setAlwaysOnTop(
+            true,
+            'screen-saver'
+        );
+
+        win.show();
+        win.focus();
+    }
+
+    // ============================================================
+    // ДОПОЛНИТЕЛЬНАЯ ФИКСАЦИЯ
+    // ============================================================
+
+    setTimeout(() => {
+
+        if (!win || win.isDestroyed()) {
+            return;
+        }
+
+        win.setFullScreen(true);
+        win.setKiosk(true);
+
+        win.setAlwaysOnTop(
+            true,
+            'screen-saver'
+        );
+
+        win.setMenuBarVisibility(false);
+        win.setResizable(false);
+
+        win.show();
+        win.focus();
+
+    }, 500);
 
     addLog(
         'Kiosk window created',
         'system'
     );
+
+
+    
+
+addLog(
+    'Kiosk window created',
+    'system'
+);
 
     // ========================================================
     // KEY PROTECTION
@@ -2074,8 +2169,13 @@ function startInternetMonitoring() {
 // PIN WINDOW
 // ============================================================
 
+// ============================================================
+// PIN WINDOW
+// ============================================================
+
 function openPinWindow() {
 
+    // Если PIN уже открыт — просто вернуть его наверх
     if (
         pinWindow &&
         !pinWindow.isDestroyed()
@@ -2088,41 +2188,93 @@ function openPinWindow() {
         return;
     }
 
+    // ========================================================
+    // СОЗДАЁМ PIN WINDOW
+    // ========================================================
+
     pinWindow =
-        new BrowserWindow({
+    new BrowserWindow({
 
-            width: 450,
-            height: 600,
+        width: 450,
+        height: 600,
 
-            resizable: false,
+        resizable: false,
 
-            minimizable: false,
-            maximizable: false,
+        minimizable: false,
+        maximizable: false,
+        closable: true,
 
-            fullscreenable: false,
+        fullscreenable: false,
 
-            autoHideMenuBar: true,
+        frame: false,
 
-            alwaysOnTop: true,
+        autoHideMenuBar: true,
 
-            skipTaskbar: true,
+        // PIN является дочерним окном kiosk
+        parent:
+            win &&
+            !win.isDestroyed()
+                ? win
+                : undefined,
 
-            focusable: true,
+        modal: false,
 
-            webPreferences: {
+        alwaysOnTop: true,
 
-                contextIsolation: true,
-                nodeIntegration: false,
+        skipTaskbar: true,
 
-                preload:
-                    path.join(
-                        __dirname,
-                        'preload.js'
-                    )
-            }
-        });
+        focusable: true,
+
+        backgroundColor: '#0b1020',
+
+        webPreferences: {
+
+            contextIsolation: true,
+            nodeIntegration: false,
+
+            preload:
+                path.join(
+                    __dirname,
+                    'preload.js'
+                )
+        }
+    });
+
+
+// ============================================================
+// PIN WINDOW — НЕ ДАЁМ WINDOWS ПОКАЗАТЬ TASKBAR
+// ============================================================
+
+pinWindow.setAlwaysOnTop(
+    true,
+    'screen-saver'
+);
+
+pinWindow.setMenuBarVisibility(false);
+
+pinWindow.setSkipTaskbar(true);
+
+pinWindow.show();
+pinWindow.focus();
+
+hideWindowsTaskbar();
+
+
+// ============================================================
+// ПОСЛЕ ПОКАЗА PIN ВОЗВРАЩАЕМ KIOSK
+// ============================================================
+
+
+
+    // ========================================================
+    // ПОЗИЦИЯ
+    // ========================================================
 
     pinWindow.center();
+
+    // ========================================================
+    // ЗАГРУЗКА PIN
+    // ========================================================
 
     pinWindow.loadFile(
         path.join(
@@ -2132,6 +2284,10 @@ function openPinWindow() {
         )
     );
 
+    // ========================================================
+    // WINDOWS — ПРИНУДИТЕЛЬНО ПОВЕРХ KIOSK
+    // ========================================================
+
     pinWindow.setAlwaysOnTop(
         true,
         'screen-saver'
@@ -2140,6 +2296,26 @@ function openPinWindow() {
     pinWindow.setSkipTaskbar(
         true
     );
+
+    // ========================================================
+    // ВАЖНО:
+    // ОСНОВНОЙ KIOSK НЕ ДОЛЖЕН ТЕРЯТЬ KIOSK MODE
+    // ========================================================
+
+    if (
+        win &&
+        !win.isDestroyed()
+    ) {
+
+        win.setKiosk(true);
+        win.setFullScreen(true);
+        win.setMenuBarVisibility(false);
+        win.setResizable(false);
+    }
+
+    // ========================================================
+    // ПОКАЗ PIN
+    // ========================================================
 
     pinWindow.once(
         'ready-to-show',
@@ -2155,14 +2331,84 @@ function openPinWindow() {
             pinWindow.show();
             pinWindow.focus();
             pinWindow.moveTop();
+
+            // Повторно фиксируем окно поверх всех окон
+            pinWindow.setAlwaysOnTop(
+                true,
+                'screen-saver'
+            );
+
+            pinWindow.setSkipTaskbar(
+                true
+            );
         }
     );
+
+    // ========================================================
+    // ЕСЛИ PIN ПОТЕРЯЛ ФОКУС
+    // ========================================================
+
+    pinWindow.on(
+        'blur',
+        () => {
+
+            if (
+                !pinWindow ||
+                pinWindow.isDestroyed()
+            ) {
+                return;
+            }
+
+            // Через небольшой интервал возвращаем PIN наверх
+            setTimeout(
+                () => {
+
+                    if (
+                        !pinWindow ||
+                        pinWindow.isDestroyed()
+                    ) {
+                        return;
+                    }
+
+                    pinWindow.show();
+                    pinWindow.focus();
+                    pinWindow.moveTop();
+
+                    pinWindow.setAlwaysOnTop(
+                        true,
+                        'screen-saver'
+                    );
+
+                },
+                50
+            );
+        }
+    );
+
+    // ========================================================
+    // ЗАКРЫТИЕ
+    // ========================================================
 
     pinWindow.on(
         'closed',
         () => {
 
             pinWindow = null;
+
+            // После закрытия PIN снова фиксируем kiosk
+            if (
+                win &&
+                !win.isDestroyed()
+            ) {
+
+                win.setKiosk(true);
+                win.setFullScreen(true);
+                win.setMenuBarVisibility(false);
+                win.setResizable(false);
+
+                win.moveTop();
+                win.focus();
+            }
         }
     );
 }
@@ -2173,13 +2419,19 @@ function openPinWindow() {
 
 function openAdminPanel() {
 
-    if (
+        if (
         adminWindow &&
         !adminWindow.isDestroyed()
     ) {
 
-        adminWindow.show();
-        adminWindow.focus();
+        adminWindow.setAlwaysOnTop(
+            true,
+            'screen-saver'
+        );
+
+        adminWindow.setSkipTaskbar(true);
+
+        adminWindow.showInactive();
         adminWindow.moveTop();
 
         sendUpdateStatus();
@@ -2203,11 +2455,13 @@ function openAdminPanel() {
 
             fullscreenable: false,
 
+            frame: false,
+
             autoHideMenuBar: true,
 
             alwaysOnTop: true,
 
-            skipTaskbar: false,
+            skipTaskbar: true,
 
             backgroundColor:
                 '#0b1020',
@@ -2251,21 +2505,31 @@ function openAdminPanel() {
                 return;
             }
 
-            adminWindow.show();
-            adminWindow.focus();
-            adminWindow.moveTop();
+            adminWindow.showInactive();
+adminWindow.moveTop();
 
-            sendUpdateStatus();
+adminWindow.setAlwaysOnTop(
+    true,
+    'screen-saver'
+);
+
+adminWindow.setSkipTaskbar(true);
+
+sendUpdateStatus();
+
+hideWindowsTaskbar();
         }
     );
 
     adminWindow.on(
-        'closed',
-        () => {
+    'closed',
+    () => {
 
-            adminWindow = null;
-        }
-    );
+        adminWindow = null;
+
+        hideWindowsTaskbar();
+    }
+);
 
     addLog(
         'Admin panel opened',
@@ -2562,6 +2826,23 @@ ipcMain.handle(
     async () => {
 
         return await checkInternet();
+    }
+);
+
+ipcMain.handle(
+    'admin-exit-app',
+    () => {
+
+        console.log(
+            'ADMIN REQUESTED FULL APPLICATION EXIT'
+        );
+
+        addLog(
+            'Application completely closed by administrator',
+            'admin'
+        );
+
+        app.exit(0);
     }
 );
 
