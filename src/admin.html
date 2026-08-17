@@ -1164,160 +1164,262 @@
             ================================================== -->
 
             <section
-                id="section-update"
-                class="section"
+    id="section-update"
+    class="section"
+>
+
+    <div class="section-header">
+        <h2>Aktualizacja aplikacji</h2>
+
+        <p>
+            Zarządzanie aktualizacjami ITLab Store Kiosk
+        </p>
+    </div>
+
+
+    <!-- ======================================================
+         UPDATE CENTER
+         ====================================================== -->
+
+    <div class="card update-hero">
+
+        <div class="update-hero-top">
+
+            <div class="update-icon">
+                ↻
+            </div>
+
+            <div class="update-title-wrap">
+
+                <h3 class="update-title">
+                    Centrum aktualizacji
+                </h3>
+
+                <div class="update-subtitle">
+                    Sprawdź dostępność nowej wersji aplikacji
+                </div>
+
+            </div>
+
+            <div
+                id="updateState"
+                class="update-state neutral"
             >
+                Sprawdzanie
+            </div>
 
-                <div class="section-header">
+        </div>
 
-                    <h2>Aktualizacja aplikacji</h2>
 
-                    <p>
-                        Sprawdzaj, pobieraj i instaluj nowe wersje
-                        ITLab Store Kiosk.
-                    </p>
+        <!-- ==================================================
+             VERSION
+             ================================================== -->
+
+        <div class="update-version-box">
+
+            <div class="version-item">
+
+                <div class="version-label">
+                    Aktualna wersja
+                </div>
+
+                <div
+                    id="currentVersion"
+                    class="version-number"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="version-arrow">
+                →
+            </div>
+
+
+            <div class="version-item">
+
+                <div class="version-label">
+                    Dostępna wersja
+                </div>
+
+                <div
+                    id="availableVersion"
+                    class="version-number"
+                >
+                    Brak
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==================================================
+             DESCRIPTION
+             ================================================== -->
+
+        <div
+            id="updateDescription"
+            class="update-description"
+        >
+            Sprawdzanie statusu aktualizacji...
+        </div>
+
+
+        <!-- ==================================================
+             STATUS
+             ================================================== -->
+
+        <div class="update-status-box">
+
+            <div class="status-row">
+
+                <div class="status-label">
+                    Status
+                </div>
+
+                <div
+                    id="updateStatus"
+                    class="status-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="status-row">
+
+                <div class="status-label">
+                    Postęp pobierania
+                </div>
+
+                <div
+                    id="downloadPercent"
+                    class="status-value"
+                >
+                    0%
+                </div>
+
+            </div>
+
+
+            <div class="update-progress-wrap">
+
+                <div class="update-progress-header">
+
+                    <div class="update-progress-title">
+                        Pobieranie aktualizacji
+                    </div>
+
+                    <div
+                        id="downloadPercentTop"
+                        class="update-progress-percent"
+                    >
+                        0%
+                    </div>
 
                 </div>
 
-
-                <div class="update-hero">
-
-                    <div class="update-version">
-                        Aktualna wersja
-                    </div>
+                <div class="update-progress">
 
                     <div
-                        id="currentVersion"
-                        class="update-title"
-                    >
-                        —
-                    </div>
-
-                    <div
-                        id="updateDescription"
-                        class="update-description"
-                    >
-                        Sprawdzanie statusu aktualizacji...
-                    </div>
-
-                    <div class="update-status-box">
-
-                        <div class="status-row">
-
-                            <div class="status-label">
-                                Dostępna wersja
-                            </div>
-
-                            <div
-                                id="availableVersion"
-                                class="status-value"
-                            >
-                                Brak
-                            </div>
-
-                        </div>
-
-                        <div class="status-row">
-
-                            <div class="status-label">
-                                Status
-                            </div>
-
-                            <div
-                                id="updateStatus"
-                                class="status-value"
-                            >
-                                —
-                            </div>
-
-                        </div>
-
-                        <div class="status-row">
-
-                            <div class="status-label">
-                                Postęp pobierania
-                            </div>
-
-                            <div
-                                id="downloadPercent"
-                                class="status-value"
-                            >
-                                0%
-                            </div>
-
-                        </div>
-
-                        <div class="progress">
-
-                            <div
-                                id="progressBar"
-                                class="progress-bar"
-                            ></div>
-
-                        </div>
-
-                    </div>
-
-                    <br>
-
-                    <div class="button-row">
-
-                        <button
-                            class="btn primary"
-                            id="checkUpdateButton"
-                        >
-                            🔍 Sprawdź aktualizacje
-                        </button>
-
-                        <button
-                            class="btn"
-                            id="downloadUpdateButton"
-                            disabled
-                        >
-                            ↓ Pobierz aktualizację
-                        </button>
-
-                        <button
-                            class="btn success"
-                            id="installUpdateButton"
-                            disabled
-                        >
-                            ✓ Zainstaluj i uruchom ponownie
-                        </button>
-
-                    </div>
-
-                    <div
-                        id="releaseNotes"
-                        class="release-notes"
-                        style="display:none;"
+                        id="progressBar"
+                        class="update-progress-bar"
                     ></div>
 
                 </div>
 
+            </div>
 
-                <div class="card">
+        </div>
 
-                    <div class="card-title">
-                        Informacja
-                    </div>
 
-                    <div
-                        style="
-                            margin-top:10px;
-                            color:#8d98ac;
-                            font-size:13px;
-                            line-height:1.7;
-                        "
-                    >
-                        Aktualizacje pobierane są z GitHub.
-                        Po pobraniu aktualizacji aplikacja może
-                        zostać ponownie uruchomiona automatycznie.
-                    </div>
+        <!-- ==================================================
+             BUTTONS
+             ================================================== -->
 
-                </div>
+        <div class="update-actions">
 
-            </section>
+            <button
+                class="btn primary"
+                id="checkUpdateButton"
+            >
+                🔍 Sprawdź aktualizacje
+            </button>
+
+
+            <button
+                class="btn"
+                id="downloadUpdateButton"
+                disabled
+            >
+                ↓ Pobierz aktualizację
+            </button>
+
+
+            <button
+                class="btn success"
+                id="installUpdateButton"
+                disabled
+            >
+                ✓ Zainstaluj i uruchom ponownie
+            </button>
+
+        </div>
+
+
+        <!-- ==================================================
+             RELEASE NOTES
+             ================================================== -->
+
+        <div
+            id="releaseNotes"
+            class="update-release-notes"
+        >
+
+            <div class="release-notes-title">
+                📋 Informacje o wydaniu
+            </div>
+
+            <div
+                id="releaseNotesContent"
+                class="release-notes-content"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         INFORMATION CARD
+         ====================================================== -->
+
+    <div class="card">
+
+        <div class="card-title">
+            Informacja
+        </div>
+
+        <div
+            style="
+                margin-top:10px;
+                color:#8d98ac;
+                font-size:13px;
+                line-height:1.7;
+            "
+        >
+            Aktualizacje są pobierane bezpośrednio z GitHub.
+            Po pobraniu nowej wersji aplikacja może zostać
+            automatycznie uruchomiona ponownie.
+        </div>
+
+    </div>
+
+</section>
 
 
             <!-- =================================================
@@ -2352,127 +2454,281 @@
     }
 
 
-    function renderUpdateStatus(
-        update
-    ) {
+    function renderUpdateStatus(update) {
 
-        const currentVersion =
-            update.currentVersion ||
-            '—';
+    const currentVersion =
+        update.currentVersion || '—';
 
+    const available =
+        update.availableVersion || null;
 
-        $('currentVersion').textContent =
-            `v${currentVersion}`;
-
-
-        const available =
-            update.availableVersion;
+    const progress =
+        Number(update.progress || 0);
 
 
-        $('availableVersion').textContent =
-            available
-                ? `v${available}`
-                : 'Brak';
+    // ========================================================
+    // VERSION
+    // ========================================================
+
+    $('currentVersion').textContent =
+        `v${currentVersion}`;
+
+    $('availableVersion').textContent =
+        available
+            ? `v${available}`
+            : 'Brak';
 
 
-        $('downloadPercent').textContent =
-            `${update.progress || 0}%`;
+    // ========================================================
+    // PROGRESS
+    // ========================================================
+
+    const safeProgress =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                progress
+            )
+        );
 
 
-        $('progressBar').style.width =
-            `${update.progress || 0}%`;
+    $('downloadPercent').textContent =
+        `${safeProgress}%`;
+
+    const topPercent =
+        $('downloadPercentTop');
+
+    if (topPercent) {
+        topPercent.textContent =
+            `${safeProgress}%`;
+    }
 
 
-        const downloadButton =
-            $('downloadUpdateButton');
+    $('progressBar').style.width =
+        `${safeProgress}%`;
 
-        const installButton =
-            $('installUpdateButton');
 
+    // ========================================================
+    // ELEMENTS
+    // ========================================================
+
+    const downloadButton =
+        $('downloadUpdateButton');
+
+    const installButton =
+        $('installUpdateButton');
+
+    const state =
+        $('updateState');
+
+    const status =
+        $('updateStatus');
+
+    const description =
+        $('updateDescription');
+
+    const releaseNotes =
+        $('releaseNotes');
+
+    const releaseNotesContent =
+        $('releaseNotesContent');
+
+
+    // ========================================================
+    // RESET
+    // ========================================================
+
+    if (releaseNotes) {
+        releaseNotes.style.display =
+            'none';
+    }
+
+
+    // ========================================================
+    // ERROR
+    // ========================================================
+
+    if (update.error) {
+
+        status.innerHTML =
+            '<span class="update-state danger">BŁĄD</span>';
+
+        state.className =
+            'update-state danger';
+
+        state.textContent =
+            'Błąd';
+
+        description.textContent =
+            update.error;
 
         downloadButton.disabled =
-            !available ||
-            update.downloading ||
-            update.updateDownloaded;
-
+            true;
 
         installButton.disabled =
-            !update.updateDownloaded;
+            true;
 
-
-        if (update.error) {
-
-            $('updateStatus').innerHTML =
-                '<span class="badge danger">BŁĄD</span>';
-
-            $('updateDescription').textContent =
-                update.error;
-
-            return;
-        }
-
-
-        if (update.updateDownloaded) {
-
-            $('updateStatus').innerHTML =
-                '<span class="badge success">POBRANO</span>';
-
-            $('updateDescription').textContent =
-                `Aktualizacja v${available} jest gotowa do instalacji.`;
-
-            return;
-        }
-
-
-        if (update.downloading) {
-
-            $('updateStatus').innerHTML =
-                '<span class="badge warning">POBIERANIE</span>';
-
-            $('updateDescription').textContent =
-                'Trwa pobieranie aktualizacji...';
-
-            return;
-        }
-
-
-        if (available) {
-
-            $('updateStatus').innerHTML =
-                '<span class="badge warning">DOSTĘPNA</span>';
-
-            $('updateDescription').textContent =
-                `Dostępna jest nowa wersja v${available}.`;
-
-            if (
-                update.releaseNotes
-            ) {
-
-                $('releaseNotes').style.display =
-                    'block';
-
-                $('releaseNotes').textContent =
-                    typeof update.releaseNotes === 'string'
-                        ? update.releaseNotes
-                        : JSON.stringify(
-                            update.releaseNotes,
-                            null,
-                            2
-                        );
-
-            }
-
-            return;
-        }
-
-
-        $('updateStatus').innerHTML =
-            '<span class="badge success">AKTUALNA</span>';
-
-        $('updateDescription').textContent =
-            'Aplikacja jest aktualna.';
-
+        return;
     }
+
+
+    // ========================================================
+    // DOWNLOADED
+    // ========================================================
+
+    if (update.updateDownloaded) {
+
+        status.innerHTML =
+            '<span class="update-state success">POBRANO</span>';
+
+        state.className =
+            'update-state success';
+
+        state.textContent =
+            'Gotowa';
+
+        description.textContent =
+            available
+                ? `Aktualizacja v${available} jest gotowa do instalacji.`
+                : 'Aktualizacja jest gotowa do instalacji.';
+
+        downloadButton.disabled =
+            true;
+
+        installButton.disabled =
+            false;
+
+        $('progressBar').style.width =
+            '100%';
+
+        $('downloadPercent').textContent =
+            '100%';
+
+        if (topPercent) {
+            topPercent.textContent =
+                '100%';
+        }
+
+        return;
+    }
+
+
+    // ========================================================
+    // DOWNLOADING
+    // ========================================================
+
+    if (update.downloading) {
+
+        status.innerHTML =
+            '<span class="update-state warning">POBIERANIE</span>';
+
+        state.className =
+            'update-state warning update-check-animation';
+
+        state.textContent =
+            'Pobieranie';
+
+        description.textContent =
+            available
+                ? `Pobieranie wersji v${available}...`
+                : 'Trwa pobieranie aktualizacji...';
+
+        downloadButton.disabled =
+            true;
+
+        installButton.disabled =
+            true;
+
+        return;
+    }
+
+
+    // ========================================================
+    // AVAILABLE UPDATE
+    // ========================================================
+
+    if (available) {
+
+        status.innerHTML =
+            '<span class="update-state warning">DOSTĘPNA</span>';
+
+        state.className =
+            'update-state warning';
+
+        state.textContent =
+            'Dostępna';
+
+        description.textContent =
+            `Dostępna jest nowa wersja v${available}.`;
+
+        downloadButton.disabled =
+            false;
+
+        installButton.disabled =
+            true;
+
+
+        // ----------------------------------------------------
+        // RELEASE NOTES
+        // ----------------------------------------------------
+
+        if (
+            update.releaseNotes &&
+            releaseNotes &&
+            releaseNotesContent
+        ) {
+
+            releaseNotes.style.display =
+                'block';
+
+            releaseNotesContent.textContent =
+                typeof update.releaseNotes === 'string'
+                    ? update.releaseNotes
+                    : JSON.stringify(
+                        update.releaseNotes,
+                        null,
+                        2
+                    );
+        }
+
+        return;
+    }
+
+
+    // ========================================================
+    // UP TO DATE
+    // ========================================================
+
+    status.innerHTML =
+        '<span class="update-state success">AKTUALNA</span>';
+
+    state.className =
+        'update-state success';
+
+    state.textContent =
+        'Aktualna';
+
+    description.textContent =
+        'Aplikacja jest aktualna.';
+
+    downloadButton.disabled =
+        true;
+
+    installButton.disabled =
+        true;
+
+    $('progressBar').style.width =
+        '0%';
+
+    $('downloadPercent').textContent =
+        '0%';
+
+    if (topPercent) {
+        topPercent.textContent =
+            '0%';
+    }
+}
 
 
     async function checkForUpdate() {

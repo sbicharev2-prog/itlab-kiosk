@@ -8,3 +8,5 @@ build/
 *.7z
 *.tar
 .DS_Store
+.DS_Store
+._*

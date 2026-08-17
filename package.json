@@ -1,7 +1,7 @@
 {
   "name": "itlab-kiosk",
   "productName": "ITLab Store Kiosk",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "ITLab Store Kiosk Application",
   "main": "main.js",
   "author": {
@@ -53,16 +53,17 @@
       "artifactName": "ITLab-Store-Kiosk-${version}.${ext}"
     },
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "artifactName": "ITLab-Store-Kiosk-${version}-Setup.${ext}"
-    },
+  "icon": "src/icon.ico",
+  "target": [
+    {
+      "target": "nsis",
+      "arch": [
+        "x64"
+      ]
+    }
+  ],
+  "artifactName": "ITLab-Store-Kiosk-${version}-Setup.${ext}"
+},
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
