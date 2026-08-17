@@ -1,0 +1,3201 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ITLAB STORE — Admin Panel</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+            background: #080c16;
+            color: #f5f7fb;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* =====================================================
+           LAYOUT
+        ===================================================== */
+
+        .app {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(71, 108, 255, 0.10),
+                    transparent 30%
+                ),
+                #080c16;
+        }
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            height: 100%;
+            padding: 22px 16px;
+            background:
+                linear-gradient(
+                    180deg,
+                    #101727 0%,
+                    #0b101c 100%
+                );
+            border-right: 1px solid #20283a;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 8px 12px 25px;
+        }
+
+        .brand-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .brand-title span {
+            color: #6d8cff;
+        }
+
+        .brand-subtitle {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #7d879d;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .nav button {
+            width: 100%;
+            border: 0;
+            border-radius: 10px;
+            padding: 13px 14px;
+            background: transparent;
+            color: #aeb8cc;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            transition:
+                background .18s ease,
+                color .18s ease,
+                transform .18s ease;
+        }
+
+        .nav button:hover {
+            background: #171f31;
+            color: #ffffff;
+        }
+
+        .nav button.active {
+            background:
+                linear-gradient(
+                    135deg,
+                    #334fd1,
+                    #506df2
+                );
+            color: white;
+            box-shadow:
+                0 8px 25px rgba(70, 93, 220, .25);
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 10px 4px 0;
+        }
+
+        .connection {
+            padding: 12px;
+            border: 1px solid #20283a;
+            background: #0c1220;
+            border-radius: 10px;
+        }
+
+        .connection-title {
+            font-size: 11px;
+            color: #6f7a91;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .connection-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #aeb8cc;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4b5568;
+        }
+
+        .dot.online {
+            background: #43d17a;
+            box-shadow: 0 0 10px rgba(67, 209, 122, .5);
+        }
+
+        .dot.offline {
+            background: #ff5f6d;
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            height: 75px;
+            min-height: 75px;
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #20283a;
+            background: rgba(10, 15, 27, .75);
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 750;
+        }
+
+        .page-description {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #707b91;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 28px;
+        }
+
+        /* =====================================================
+           SECTIONS
+        ===================================================== */
+
+        .section {
+            display: none;
+            animation: fade .18s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            margin-bottom: 22px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .section-header p {
+            margin: 7px 0 0;
+            color: #707b91;
+            font-size: 13px;
+        }
+
+        /* =====================================================
+           CARDS
+        ===================================================== */
+
+        .grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(220px, 1fr)
+                );
+            gap: 16px;
+        }
+
+        .card {
+            border: 1px solid #20283a;
+            border-radius: 14px;
+            background:
+                linear-gradient(
+                    145deg,
+                    #101727,
+                    #0c1220
+                );
+            padding: 20px;
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, .15);
+        }
+
+        .card-title {
+            font-size: 12px;
+            color: #737e94;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .card-value {
+            margin-top: 9px;
+            font-size: 25px;
+            font-weight: 750;
+        }
+
+        .card-description {
+            margin-top: 7px;
+            font-size: 12px;
+            color: #6f7a90;
+        }
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+
+        .btn {
+            border: 1px solid #29334a;
+            border-radius: 9px;
+            padding: 10px 15px;
+            color: #e8edf7;
+            background: #151c2b;
+            font-size: 13px;
+            font-weight: 650;
+            transition: .18s ease;
+        }
+
+        .btn:hover {
+            background: #1d273b;
+            border-color: #3a4864;
+        }
+
+        .btn.primary {
+            background:
+                linear-gradient(
+                    135deg,
+                    #3856dc,
+                    #5675ff
+                );
+            border-color: transparent;
+        }
+
+        .btn.primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn.success {
+            background: #123a29;
+            border-color: #1d6846;
+            color: #68e09a;
+        }
+
+        .btn.danger {
+            background: #3b151b;
+            border-color: #64242d;
+            color: #ff7c87;
+        }
+
+        .btn.warning {
+            background: #3a2b10;
+            border-color: #624a18;
+            color: #f4c85c;
+        }
+
+        .btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 14px 0;
+            border-bottom: 1px solid #20283a;
+        }
+
+        .status-row:last-child {
+            border-bottom: 0;
+        }
+
+        .status-label {
+            color: #78839a;
+            font-size: 13px;
+        }
+
+        .status-value {
+            font-weight: 650;
+            text-align: right;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #151d2d;
+            color: #aab5c9;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge.success {
+            background: #103522;
+            color: #61df93;
+        }
+
+        .badge.danger {
+            background: #3c151c;
+            color: #ff7984;
+        }
+
+        .badge.warning {
+            background: #3c2c10;
+            color: #f3c65a;
+        }
+
+        /* =====================================================
+           UPDATE
+        ===================================================== */
+
+        .update-hero {
+            padding: 26px;
+            border-radius: 16px;
+            border: 1px solid #27334a;
+            background:
+                radial-gradient(
+                    circle at right top,
+                    rgba(74, 104, 255, .18),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    145deg,
+                    #121a2b,
+                    #0c1220
+                );
+            margin-bottom: 18px;
+        }
+
+        .update-version {
+            font-size: 12px;
+            color: #78849a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .update-title {
+            margin-top: 8px;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .update-description {
+            margin-top: 8px;
+            color: #7d879d;
+            font-size: 13px;
+        }
+
+        .update-status-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #0a101c;
+            border: 1px solid #20283a;
+        }
+
+        .progress {
+            width: 100%;
+            height: 9px;
+            margin-top: 12px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #20283a;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            background:
+                linear-gradient(
+                    90deg,
+                    #4563ed,
+                    #7390ff
+                );
+            transition: width .25s ease;
+        }
+
+        .release-notes {
+            white-space: pre-wrap;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 13px;
+            margin-top: 15px;
+            border-radius: 9px;
+            background: #090e18;
+            border: 1px solid #20283a;
+            color: #9ca7ba;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* =====================================================
+           TABLE
+        ===================================================== */
+
+        .table-wrap {
+            overflow: auto;
+            border: 1px solid #20283a;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px 15px;
+            text-align: left;
+            border-bottom: 1px solid #20283a;
+            font-size: 12px;
+        }
+
+        th {
+            background: #101727;
+            color: #7c879c;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        td {
+            color: #b4bdd0;
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        /* =====================================================
+           LOGS
+        ===================================================== */
+
+        .log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .log-item {
+            padding: 12px 14px;
+            border-radius: 9px;
+            border: 1px solid #20283a;
+            background: #0e1523;
+        }
+
+        .log-time {
+            color: #667188;
+            font-size: 10px;
+        }
+
+        .log-message {
+            margin-top: 5px;
+            color: #b6bfd0;
+            font-size: 12px;
+        }
+
+        .log-type {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 10px;
+            color: #71809b;
+        }
+
+        /* =====================================================
+           REMOTE
+        ===================================================== */
+
+        .ip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ip {
+            padding: 11px 13px;
+            border-radius: 8px;
+            background: #0b111d;
+            border: 1px solid #20283a;
+            font-family: monospace;
+            color: #9eabbe;
+        }
+
+        /* =====================================================
+           TOAST
+        ===================================================== */
+
+        .toast-container {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .toast {
+            min-width: 260px;
+            max-width: 420px;
+            padding: 13px 16px;
+            border-radius: 10px;
+            border: 1px solid #29334a;
+            background: #111927;
+            box-shadow: 0 15px 35px rgba(0,0,0,.35);
+            color: #dce3ef;
+            font-size: 12px;
+            animation: toastIn .2s ease;
+        }
+
+        .toast.success {
+            border-color: #225d42;
+        }
+
+        .toast.error {
+            border-color: #6c2931;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 850px) {
+
+            .sidebar {
+                width: 205px;
+                min-width: 205px;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-title">
+                ITLAB <span>STORE</span>
+            </div>
+
+            <div class="brand-subtitle">
+                Kiosk Administration
+            </div>
+
+        </div>
+
+        <nav class="nav">
+
+            <button
+                class="active"
+                data-section="home"
+            >
+                ◉ &nbsp; Dashboard
+            </button>
+
+            <button
+                data-section="internet"
+            >
+                ◌ &nbsp; Internet
+            </button>
+
+            <button
+                data-section="kiosk"
+            >
+                ▣ &nbsp; Kiosk
+            </button>
+
+            <button
+                data-section="update"
+            >
+                ↻ &nbsp; Aktualizacja
+            </button>
+
+            <button
+                data-section="history"
+            >
+                ◷ &nbsp; Historia
+            </button>
+
+            <button
+                data-section="logs"
+            >
+                ≡ &nbsp; Logi
+            </button>
+
+            <button
+                data-section="system"
+            >
+                ⚙ &nbsp; System
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="connection">
+
+                <div class="connection-title">
+                    Status aplikacji
+                </div>
+
+                <div class="connection-value">
+
+                    <span
+                        id="connectionDot"
+                        class="dot"
+                    ></span>
+
+                    <span id="connectionText">
+                        Sprawdzanie...
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <div
+                    id="pageTitle"
+                    class="page-title"
+                >
+                    Dashboard
+                </div>
+
+                <div
+                    id="pageDescription"
+                    class="page-description"
+                >
+                    Zarządzanie kioskiem ITLab Store
+                </div>
+
+            </div>
+
+            <div class="top-actions">
+
+                <button
+                    class="btn"
+                    id="refreshButton"
+                >
+                    ↻ Odśwież
+                </button>
+
+                <button
+                    class="btn danger"
+                    id="closeButton"
+                >
+                    Zamknij
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <div class="content">
+
+            <!-- =================================================
+                 HOME
+            ================================================== -->
+
+            <section
+                id="section-home"
+                class="section active"
+            >
+
+                <div class="section-header">
+
+                    <h2>Dashboard</h2>
+
+                    <p>
+                        Podstawowe informacje o kiosku.
+                    </p>
+
+                </div>
+
+                <div class="grid">
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Internet
+                        </div>
+
+                        <div
+                            id="homeInternet"
+                            class="card-value"
+                        >
+                            —
+                        </div>
+
+                        <div class="card-description">
+                            Połączenie ze sklepem
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Kiosk
+                        </div>
+
+                        <div
+                            id="homeKiosk"
+                            class="card-value"
+                        >
+                            —
+                        </div>
+
+                        <div class="card-description">
+                            Tryb pełnoekranowy
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Wersja
+                        </div>
+
+                        <div
+                            id="homeVersion"
+                            class="card-value"
+                        >
+                            —
+                        </div>
+
+                        <div class="card-description">
+                            Aktualna wersja aplikacji
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Historia
+                        </div>
+
+                        <div
+                            id="homeHistory"
+                            class="card-value"
+                        >
+                            —
+                        </div>
+
+                        <div class="card-description">
+                            Zapisanych produktów
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <br>
+
+                <div class="card">
+
+                    <div class="card-title">
+                        Szybkie akcje
+                    </div>
+
+                    <br>
+
+                    <div class="button-row">
+
+                        <button
+                            class="btn primary"
+                            id="openShopButton"
+                        >
+                            Otwórz sklep
+                        </button>
+
+                        <button
+                            class="btn"
+                            id="reloadShopButton"
+                        >
+                            Przeładuj sklep
+                        </button>
+
+                        <button
+                            class="btn"
+                            id="checkInternetButton"
+                        >
+                            Sprawdź internet
+                        </button>
+
+                        <button
+                            class="btn warning"
+                            id="restartButton"
+                        >
+                            ↻ Restart aplikacji
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 INTERNET
+            ================================================== -->
+
+            <section
+                id="section-internet"
+                class="section"
+            >
+
+                <div class="section-header">
+
+                    <h2>Internet</h2>
+
+                    <p>
+                        Sprawdź połączenie kiosku z internetem.
+                    </p>
+
+                </div>
+
+                <div class="grid">
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Połączenie
+                        </div>
+
+                        <div
+                            id="internetStatus"
+                            class="card-value"
+                        >
+                            —
+                        </div>
+
+                        <div
+                            id="internetLastCheck"
+                            class="card-description"
+                        >
+                            —
+                        </div>
+
+                        <br>
+
+                        <button
+                            class="btn primary"
+                            id="internetCheckButton"
+                        >
+                            Sprawdź połączenie
+                        </button>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Sklep
+                        </div>
+
+                        <div
+                            id="internetShop"
+                            class="card-value"
+                        >
+                            sklep.itlabstore.pl
+                        </div>
+
+                        <div class="card-description">
+                            Adres sklepu kiosku
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 KIOSK
+            ================================================== -->
+
+            <section
+                id="section-kiosk"
+                class="section"
+            >
+
+                <div class="section-header">
+
+                    <h2>Kiosk</h2>
+
+                    <p>
+                        Zarządzanie приложением kiosku.
+                    </p>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="status-row">
+
+                        <div class="status-label">
+                            Stan kiosku
+                        </div>
+
+                        <div
+                            id="kioskStatus"
+                            class="status-value"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+                    <div class="status-row">
+
+                        <div class="status-label">
+                            Aktualna strona
+                        </div>
+
+                        <div
+                            id="kioskPage"
+                            class="status-value"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+                    <div class="status-row">
+
+                        <div class="status-label">
+                            Uptime
+                        </div>
+
+                        <div
+                            id="kioskUptime"
+                            class="status-value"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+                    <br>
+
+                    <div class="button-row">
+
+                        <button
+                            class="btn primary"
+                            id="kioskOpenButton"
+                        >
+                            Otwórz sklep
+                        </button>
+
+                        <button
+                            class="btn"
+                            id="kioskReloadButton"
+                        >
+                            Przeładuj sklep
+                        </button>
+
+                        <button
+                            class="btn warning"
+                            id="kioskRestartButton"
+                        >
+                            ↻ Restart aplikacji
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 UPDATE
+            ================================================== -->
+
+            <section
+                id="section-update"
+                class="section"
+            >
+
+                <div class="section-header">
+
+                    <h2>Aktualizacja aplikacji</h2>
+
+                    <p>
+                        Sprawdzaj, pobieraj i instaluj nowe wersje
+                        ITLab Store Kiosk.
+                    </p>
+
+                </div>
+
+
+                <div class="update-hero">
+
+                    <div class="update-version">
+                        Aktualna wersja
+                    </div>
+
+                    <div
+                        id="currentVersion"
+                        class="update-title"
+                    >
+                        —
+                    </div>
+
+                    <div
+                        id="updateDescription"
+                        class="update-description"
+                    >
+                        Sprawdzanie statusu aktualizacji...
+                    </div>
+
+                    <div class="update-status-box">
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                Dostępna wersja
+                            </div>
+
+                            <div
+                                id="availableVersion"
+                                class="status-value"
+                            >
+                                Brak
+                            </div>
+
+                        </div>
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                Status
+                            </div>
+
+                            <div
+                                id="updateStatus"
+                                class="status-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                Postęp pobierania
+                            </div>
+
+                            <div
+                                id="downloadPercent"
+                                class="status-value"
+                            >
+                                0%
+                            </div>
+
+                        </div>
+
+                        <div class="progress">
+
+                            <div
+                                id="progressBar"
+                                class="progress-bar"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    <br>
+
+                    <div class="button-row">
+
+                        <button
+                            class="btn primary"
+                            id="checkUpdateButton"
+                        >
+                            🔍 Sprawdź aktualizacje
+                        </button>
+
+                        <button
+                            class="btn"
+                            id="downloadUpdateButton"
+                            disabled
+                        >
+                            ↓ Pobierz aktualizację
+                        </button>
+
+                        <button
+                            class="btn success"
+                            id="installUpdateButton"
+                            disabled
+                        >
+                            ✓ Zainstaluj i uruchom ponownie
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="releaseNotes"
+                        class="release-notes"
+                        style="display:none;"
+                    ></div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        Informacja
+                    </div>
+
+                    <div
+                        style="
+                            margin-top:10px;
+                            color:#8d98ac;
+                            font-size:13px;
+                            line-height:1.7;
+                        "
+                    >
+                        Aktualizacje pobierane są z GitHub.
+                        Po pobraniu aktualizacji aplikacja może
+                        zostać ponownie uruchomiona automatycznie.
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 HISTORY
+            ================================================== -->
+
+            <section
+                id="section-history"
+                class="section"
+            >
+
+                <div class="section-header">
+
+                    <h2>Historia</h2>
+
+                    <p>
+                        История открытых товаров.
+                    </p>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="button-row">
+
+                        <button
+                            class="btn"
+                            id="historyRefreshButton"
+                        >
+                            ↻ Odśwież
+                        </button>
+
+                        <button
+                            class="btn danger"
+                            id="historyClearButton"
+                        >
+                            Usuń historię
+                        </button>
+
+                    </div>
+
+                    <br>
+
+                    <div
+                        id="historyContainer"
+                        class="table-wrap"
+                    >
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Produkt</th>
+                                    <th>URL</th>
+                                    <th>Data</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="historyBody">
+
+                                <tr>
+                                    <td colspan="3">
+                                        Ładowanie...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 LOGS
+            ================================================== -->
+
+            <section
+                id="section-logs"
+                class="section"
+            >
+
+                <div class="section-header">
+
+                    <h2>Logi</h2>
+
+                    <p>
+                        Dziennik zdarzeń aplikacji.
+                    </p>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="button-row">
+
+                        <button
+                            class="btn"
+                            id="logsRefreshButton"
+                        >
+                            ↻ Odśwież logi
+                        </button>
+
+                    </div>
+
+                    <br>
+
+                    <div
+                        id="logsContainer"
+                        class="log-list"
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 SYSTEM
+            ================================================== -->
+
+            <section
+                id="section-system"
+                class="section"
+            >
+
+                <div class="section-header">
+
+                    <h2>System</h2>
+
+                    <p>
+                        Informacje techniczne urządzenia.
+                    </p>
+
+                </div>
+
+                <div class="grid">
+
+                    <div class="card">
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                Hostname
+                            </div>
+
+                            <div
+                                id="systemHostname"
+                                class="status-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                Platforma
+                            </div>
+
+                            <div
+                                id="systemPlatform"
+                                class="status-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                Architektura
+                            </div>
+
+                            <div
+                                id="systemArch"
+                                class="status-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                CPU
+                            </div>
+
+                            <div
+                                id="systemCPU"
+                                class="status-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                RAM
+                            </div>
+
+                            <div
+                                id="systemRAM"
+                                class="status-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                Electron
+                            </div>
+
+                            <div
+                                id="systemElectron"
+                                class="status-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                Chrome
+                            </div>
+
+                            <div
+                                id="systemChrome"
+                                class="status-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="status-row">
+
+                            <div class="status-label">
+                                Node
+                            </div>
+
+                            <div
+                                id="systemNode"
+                                class="status-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <br>
+
+                <div class="card">
+
+                    <div class="card-title">
+                        Remote Control
+                    </div>
+
+                    <br>
+
+                    <div
+                        id="remoteIPs"
+                        class="ip-list"
+                    ></div>
+
+                    <br>
+
+                    <div class="status-row">
+
+                        <div class="status-label">
+                            Port
+                        </div>
+
+                        <div
+                            id="remotePort"
+                            class="status-value"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<div
+    id="toastContainer"
+    class="toast-container"
+></div>
+
+
+<script>
+
+    // =========================================================
+    // STATE
+    // =========================================================
+
+    const titles = {
+
+        home: {
+            title: 'Dashboard',
+            description:
+                'Zarządzanie kioskiem ITLab Store'
+        },
+
+        internet: {
+            title: 'Internet',
+            description:
+                'Kontrola połączenia internetowego'
+        },
+
+        kiosk: {
+            title: 'Kiosk',
+            description:
+                'Sterowanie aplikacją kiosku'
+        },
+
+        update: {
+            title: 'Aktualizacja aplikacji',
+            description:
+                'Sprawdzanie i instalowanie nowych wersji'
+        },
+
+        history: {
+            title: 'Historia',
+            description:
+                'Historia odwiedzonych produktów'
+        },
+
+        logs: {
+            title: 'Logi',
+            description:
+                'Dziennik zdarzeń aplikacji'
+        },
+
+        system: {
+            title: 'System',
+            description:
+                'Informacje techniczne urządzenia'
+        }
+
+    };
+
+
+    let currentSection = 'home';
+
+
+    // =========================================================
+    // HELPERS
+    // =========================================================
+
+    function $(id) {
+        return document.getElementById(id);
+    }
+
+
+    function escapeHtml(value) {
+
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+
+    function showToast(
+        message,
+        type = 'info'
+    ) {
+
+        const container =
+            $('toastContainer');
+
+        const toast =
+            document.createElement('div');
+
+        toast.className =
+            `toast ${type}`;
+
+        toast.textContent =
+            message;
+
+        container.appendChild(toast);
+
+        setTimeout(
+            () => {
+
+                toast.remove();
+
+            },
+            3500
+        );
+    }
+
+
+    function formatDate(value) {
+
+        if (!value) {
+            return '—';
+        }
+
+        try {
+
+            return new Date(value)
+                .toLocaleString(
+                    'pl-PL'
+                );
+
+        } catch {
+
+            return value;
+        }
+    }
+
+
+    // =========================================================
+    // NAVIGATION
+    // =========================================================
+
+    document
+        .querySelectorAll('.nav button')
+        .forEach(button => {
+
+            button.addEventListener(
+                'click',
+                () => {
+
+                    const section =
+                        button.dataset.section;
+
+                    switchSection(
+                        section
+                    );
+                }
+            );
+
+        });
+
+
+    function switchSection(section) {
+
+        currentSection =
+            section;
+
+        document
+            .querySelectorAll('.nav button')
+            .forEach(button => {
+
+                button.classList.toggle(
+                    'active',
+                    button.dataset.section === section
+                );
+
+            });
+
+
+        document
+            .querySelectorAll('.section')
+            .forEach(element => {
+
+                element.classList.toggle(
+                    'active',
+                    element.id ===
+                        `section-${section}`
+                );
+
+            });
+
+
+        if (titles[section]) {
+
+            $('pageTitle').textContent =
+                titles[section].title;
+
+            $('pageDescription').textContent =
+                titles[section].description;
+        }
+
+
+        if (section === 'history') {
+            loadHistory();
+        }
+
+        if (section === 'logs') {
+            loadLogs();
+        }
+
+        if (section === 'system') {
+            loadSystem();
+        }
+
+        if (section === 'update') {
+            loadUpdateStatus();
+        }
+    }
+
+
+    // =========================================================
+    // ELECTRON / REMOTE API
+    // =========================================================
+
+    const isElectron =
+        !!window.electronAPI;
+
+
+    let remoteToken =
+        localStorage.getItem(
+            'itlab_remote_token'
+        );
+
+
+    async function apiGet(
+        endpoint
+    ) {
+
+        if (isElectron) {
+
+            if (
+                endpoint === '/api/status'
+            ) {
+
+                return await window
+                    .electronAPI
+                    .getStatus();
+            }
+
+            if (
+                endpoint === '/api/history'
+            ) {
+
+                return await window
+                    .electronAPI
+                    .getHistory();
+            }
+
+            if (
+                endpoint === '/api/logs'
+            ) {
+
+                return await window
+                    .electronAPI
+                    .getLogs();
+            }
+
+            if (
+                endpoint === '/api/system'
+            ) {
+
+                return await window
+                    .electronAPI
+                    .getSystemInfo();
+            }
+
+            if (
+                endpoint === '/api/update-status'
+            ) {
+
+                return await window
+                    .electronAPI
+                    .getUpdateStatus();
+            }
+
+        }
+
+
+        const response =
+            await fetch(
+                endpoint,
+                {
+                    headers: {
+
+                        'X-Admin-Token':
+                            remoteToken || ''
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
+
+        return await response.json();
+    }
+
+
+    async function apiPost(
+        endpoint,
+        body = {}
+    ) {
+
+        if (isElectron) {
+
+            if (
+                endpoint === '/api/check-update'
+            ) {
+
+                return await window
+                    .electronAPI
+                    .checkForUpdate();
+            }
+
+            if (
+                endpoint === '/api/download-update'
+            ) {
+
+                return await window
+                    .electronAPI
+                    .downloadUpdate();
+            }
+
+            if (
+                endpoint === '/api/install-update'
+            ) {
+
+                return await window
+                    .electronAPI
+                    .installUpdate();
+            }
+
+            if (
+                endpoint === '/api/check-internet'
+            ) {
+
+                return {
+                    success: true,
+                    internet:
+                        await window
+                            .electronAPI
+                            .checkInternet()
+                };
+            }
+
+            if (
+                endpoint === '/api/open-shop'
+            ) {
+
+                window
+                    .electronAPI
+                    .openShop();
+
+                return {
+                    success: true
+                };
+            }
+
+            if (
+                endpoint === '/api/reload-shop'
+            ) {
+
+                window
+                    .electronAPI
+                    .reloadShop();
+
+                return {
+                    success: true
+                };
+            }
+
+            if (
+                endpoint === '/api/restart-kiosk'
+            ) {
+
+                window
+                    .electronAPI
+                    .restartKiosk();
+
+                return {
+                    success: true
+                };
+            }
+
+            if (
+                endpoint === '/api/clear-history'
+            ) {
+
+                window
+                    .electronAPI
+                    .clearHistory();
+
+                return {
+                    success: true
+                };
+            }
+
+        }
+
+
+        const response =
+            await fetch(
+                endpoint,
+                {
+
+                    method: 'POST',
+
+                    headers: {
+
+                        'Content-Type':
+                            'application/json',
+
+                        'X-Admin-Token':
+                            remoteToken || ''
+                    },
+
+                    body:
+                        JSON.stringify(body)
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
+
+        return await response.json();
+    }
+
+
+    // =========================================================
+    // STATUS
+    // =========================================================
+
+    async function loadStatus() {
+
+        try {
+
+            const data =
+                await apiGet(
+                    '/api/status'
+                );
+
+
+            const internet =
+                data.internet === true;
+
+            $('homeInternet').textContent =
+                internet
+                    ? 'ONLINE'
+                    : 'OFFLINE';
+
+
+            $('homeKiosk').textContent =
+                data.kiosk
+                    ? 'ACTIVE'
+                    : 'INACTIVE';
+
+
+            $('homeVersion').textContent =
+                data.appVersion || '—';
+
+
+            $('homeHistory').textContent =
+                data.historyCount ?? 0;
+
+
+            $('kioskStatus').innerHTML =
+                data.kiosk
+                    ? '<span class="badge success">● ACTIVE</span>'
+                    : '<span class="badge danger">● INACTIVE</span>';
+
+
+            $('kioskPage').textContent =
+                data.page || '—';
+
+
+            $('kioskUptime').textContent =
+                data.uptime || '—';
+
+
+            $('internetStatus').innerHTML =
+                internet
+                    ? '<span class="badge success">● ONLINE</span>'
+                    : '<span class="badge danger">● OFFLINE</span>';
+
+
+            $('internetLastCheck').textContent =
+                data.lastCheck
+                    ? `Ostatnie sprawdzenie: ${data.lastCheck}`
+                    : 'Brak danych';
+
+
+            $('connectionDot').className =
+                internet
+                    ? 'dot online'
+                    : 'dot offline';
+
+
+            $('connectionText').textContent =
+                internet
+                    ? 'Połączenie aktywne'
+                    : 'Brak połączenia';
+
+
+            if (
+                Array.isArray(
+                    data.localIPs
+                )
+            ) {
+
+                renderIPs(
+                    data.localIPs,
+                    data.port
+                );
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            $('connectionDot').className =
+                'dot offline';
+
+            $('connectionText').textContent =
+                'Brak odpowiedzi';
+
+        }
+
+    }
+
+
+    // =========================================================
+    // INTERNET
+    // =========================================================
+
+    async function checkInternet() {
+
+        try {
+
+            const result =
+                await apiPost(
+                    '/api/check-internet'
+                );
+
+
+            if (
+                result.internet
+            ) {
+
+                showToast(
+                    'Połączenie internetowe działa.',
+                    'success'
+                );
+
+            } else {
+
+                showToast(
+                    'Brak połączenia z internetem.',
+                    'error'
+                );
+
+            }
+
+
+            await loadStatus();
+
+        } catch (error) {
+
+            showToast(
+                'Błąd sprawdzania internetu.',
+                'error'
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // SHOP
+    // =========================================================
+
+    async function openShop() {
+
+        try {
+
+            await apiPost(
+                '/api/open-shop'
+            );
+
+            showToast(
+                'Sklep został otwarty.',
+                'success'
+            );
+
+        } catch (error) {
+
+            showToast(
+                'Nie udało się otworzyć sklepu.',
+                'error'
+            );
+
+        }
+
+    }
+
+
+    async function reloadShop() {
+
+        try {
+
+            await apiPost(
+                '/api/reload-shop'
+            );
+
+            showToast(
+                'Sklep został przeładowany.',
+                'success'
+            );
+
+        } catch (error) {
+
+            showToast(
+                'Błąd przeładowania sklepu.',
+                'error'
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // RESTART
+    // =========================================================
+
+    async function restartApplication() {
+
+        const confirmed =
+            confirm(
+                'Czy na pewno chcesz zrestartować aplikację?'
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        try {
+
+            await apiPost(
+                '/api/restart-kiosk'
+            );
+
+            showToast(
+                'Aplikacja zostanie zrestartowana.',
+                'success'
+            );
+
+        } catch (error) {
+
+            showToast(
+                'Nie udało się zrestartować aplikacji.',
+                'error'
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // UPDATE
+    // =========================================================
+
+    async function loadUpdateStatus() {
+
+        try {
+
+            const data =
+                await apiGet(
+                    '/api/update-status'
+                );
+
+            const update =
+                data.update || data;
+
+
+            renderUpdateStatus(
+                update
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            $('updateDescription').textContent =
+                'Nie udało się pobrać statusu aktualizacji.';
+
+        }
+
+    }
+
+
+    function renderUpdateStatus(
+        update
+    ) {
+
+        const currentVersion =
+            update.currentVersion ||
+            '—';
+
+
+        $('currentVersion').textContent =
+            `v${currentVersion}`;
+
+
+        const available =
+            update.availableVersion;
+
+
+        $('availableVersion').textContent =
+            available
+                ? `v${available}`
+                : 'Brak';
+
+
+        $('downloadPercent').textContent =
+            `${update.progress || 0}%`;
+
+
+        $('progressBar').style.width =
+            `${update.progress || 0}%`;
+
+
+        const downloadButton =
+            $('downloadUpdateButton');
+
+        const installButton =
+            $('installUpdateButton');
+
+
+        downloadButton.disabled =
+            !available ||
+            update.downloading ||
+            update.updateDownloaded;
+
+
+        installButton.disabled =
+            !update.updateDownloaded;
+
+
+        if (update.error) {
+
+            $('updateStatus').innerHTML =
+                '<span class="badge danger">BŁĄD</span>';
+
+            $('updateDescription').textContent =
+                update.error;
+
+            return;
+        }
+
+
+        if (update.updateDownloaded) {
+
+            $('updateStatus').innerHTML =
+                '<span class="badge success">POBRANO</span>';
+
+            $('updateDescription').textContent =
+                `Aktualizacja v${available} jest gotowa do instalacji.`;
+
+            return;
+        }
+
+
+        if (update.downloading) {
+
+            $('updateStatus').innerHTML =
+                '<span class="badge warning">POBIERANIE</span>';
+
+            $('updateDescription').textContent =
+                'Trwa pobieranie aktualizacji...';
+
+            return;
+        }
+
+
+        if (available) {
+
+            $('updateStatus').innerHTML =
+                '<span class="badge warning">DOSTĘPNA</span>';
+
+            $('updateDescription').textContent =
+                `Dostępna jest nowa wersja v${available}.`;
+
+            if (
+                update.releaseNotes
+            ) {
+
+                $('releaseNotes').style.display =
+                    'block';
+
+                $('releaseNotes').textContent =
+                    typeof update.releaseNotes === 'string'
+                        ? update.releaseNotes
+                        : JSON.stringify(
+                            update.releaseNotes,
+                            null,
+                            2
+                        );
+
+            }
+
+            return;
+        }
+
+
+        $('updateStatus').innerHTML =
+            '<span class="badge success">AKTUALNA</span>';
+
+        $('updateDescription').textContent =
+            'Aplikacja jest aktualna.';
+
+    }
+
+
+    async function checkForUpdate() {
+
+        const button =
+            $('checkUpdateButton');
+
+        button.disabled =
+            true;
+
+        button.textContent =
+            '⏳ Sprawdzanie...';
+
+
+        try {
+
+            const result =
+                await apiPost(
+                    '/api/check-update'
+                );
+
+
+            if (
+                result.development
+            ) {
+
+                showToast(
+                    'Aktualizacje działają tylko w gotowej aplikacji.',
+                    'warning'
+                );
+
+            } else if (
+                result.success
+            ) {
+
+                if (
+                    result.update
+                ) {
+
+                    showToast(
+                        `Dostępna nowa wersja: v${result.update.version}`,
+                        'success'
+                    );
+
+                } else {
+
+                    showToast(
+                        'Aplikacja jest aktualna.',
+                        'success'
+                    );
+
+                }
+
+            } else {
+
+                showToast(
+                    result.error ||
+                    'Nie udało się sprawdzić aktualizacji.',
+                    'error'
+                );
+
+            }
+
+
+            await loadUpdateStatus();
+
+        } catch (error) {
+
+            console.error(error);
+
+            showToast(
+                'Błąd sprawdzania aktualizacji.',
+                'error'
+            );
+
+        } finally {
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                '🔍 Sprawdź aktualizacje';
+
+        }
+
+    }
+
+
+    async function downloadUpdate() {
+
+        const button =
+            $('downloadUpdateButton');
+
+        button.disabled =
+            true;
+
+        button.textContent =
+            '⏳ Pobieranie...';
+
+
+        try {
+
+            const result =
+                await apiPost(
+                    '/api/download-update'
+                );
+
+
+            if (
+                result.success
+            ) {
+
+                showToast(
+                    'Pobieranie aktualizacji rozpoczęte.',
+                    'success'
+                );
+
+            } else {
+
+                showToast(
+                    result.error ||
+                    'Nie udało się pobrać aktualizacji.',
+                    'error'
+                );
+
+            }
+
+
+            await loadUpdateStatus();
+
+        } catch (error) {
+
+            console.error(error);
+
+            showToast(
+                'Błąd pobierania aktualizacji.',
+                'error'
+            );
+
+        }
+
+    }
+
+
+    async function installUpdate() {
+
+        const confirmed =
+            confirm(
+                'Aktualizacja została pobrana. Aplikacja zostanie zamknięta i uruchomiona ponownie. Kontynuować?'
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        try {
+
+            const result =
+                await apiPost(
+                    '/api/install-update'
+                );
+
+
+            if (
+                result.success
+            ) {
+
+                showToast(
+                    'Instalowanie aktualizacji...',
+                    'success'
+                );
+
+            } else {
+
+                showToast(
+                    result.error ||
+                    'Nie udało się zainstalować aktualizacji.',
+                    'error'
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            showToast(
+                'Błąd instalowania aktualizacji.',
+                'error'
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // UPDATE EVENTS
+    // =========================================================
+
+    if (
+        isElectron &&
+        typeof window
+            .electronAPI
+            .onUpdateStatus === 'function'
+    ) {
+
+        window
+            .electronAPI
+            .onUpdateStatus(
+                data => {
+
+                    renderUpdateStatus(
+                        data
+                    );
+
+                }
+            );
+
+    }
+
+
+    // =========================================================
+    // HISTORY
+    // =========================================================
+
+    async function loadHistory() {
+
+        try {
+
+            const result =
+                await apiGet(
+                    '/api/history'
+                );
+
+
+            const history =
+                Array.isArray(result)
+                    ? result
+                    : (
+                        result.history ||
+                        []
+                    );
+
+
+            const body =
+                $('historyBody');
+
+
+            if (
+                history.length === 0
+            ) {
+
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="3">
+                            Brak historii.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            body.innerHTML =
+                history
+                    .slice(0, 500)
+                    .map(
+                        item => `
+                            <tr>
+
+                                <td>
+                                    ${escapeHtml(
+                                        item.title
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        item.url
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHtml(
+                                        formatDate(
+                                            item.time
+                                        )
+                                    )}
+                                </td>
+
+                            </tr>
+                        `
+                    )
+                    .join('');
+
+        } catch (error) {
+
+            $('historyBody').innerHTML = `
+                <tr>
+                    <td colspan="3">
+                        Błąd ładowania historii.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+    }
+
+
+    async function clearHistory() {
+
+        const confirmed =
+            confirm(
+                'Czy na pewno chcesz usunąć całą historię?'
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        try {
+
+            await apiPost(
+                '/api/clear-history'
+            );
+
+            showToast(
+                'Historia została usunięta.',
+                'success'
+            );
+
+            await loadHistory();
+            await loadStatus();
+
+        } catch (error) {
+
+            showToast(
+                'Nie udało się usunąć historii.',
+                'error'
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // LOGS
+    // =========================================================
+
+    async function loadLogs() {
+
+        try {
+
+            const result =
+                await apiGet(
+                    '/api/logs'
+                );
+
+
+            const logs =
+                Array.isArray(result)
+                    ? result
+                    : (
+                        result.logs ||
+                        []
+                    );
+
+
+            const container =
+                $('logsContainer');
+
+
+            if (
+                logs.length === 0
+            ) {
+
+                container.innerHTML =
+                    '<div class="log-item">Brak logów.</div>';
+
+                return;
+            }
+
+
+            container.innerHTML =
+                logs
+                    .slice(0, 300)
+                    .map(
+                        log => `
+                            <div class="log-item">
+
+                                <div class="log-time">
+                                    ${escapeHtml(
+                                        formatDate(
+                                            log.time
+                                        )
+                                    )}
+
+                                    <span class="log-type">
+                                        ${escapeHtml(
+                                            log.type ||
+                                            'info'
+                                        )}
+                                    </span>
+
+                                </div>
+
+                                <div class="log-message">
+                                    ${escapeHtml(
+                                        log.message
+                                    )}
+                                </div>
+
+                            </div>
+                        `
+                    )
+                    .join('');
+
+        } catch (error) {
+
+            $('logsContainer').innerHTML =
+                '<div class="log-item">Błąd ładowania logów.</div>';
+
+        }
+
+    }
+
+
+    // =========================================================
+    // SYSTEM
+    // =========================================================
+
+    async function loadSystem() {
+
+        try {
+
+            const data =
+                await apiGet(
+                    '/api/system'
+                );
+
+
+            $('systemHostname').textContent =
+                data.hostname || '—';
+
+
+            $('systemPlatform').textContent =
+                data.platform || '—';
+
+
+            $('systemArch').textContent =
+                data.arch || '—';
+
+
+            $('systemCPU').textContent =
+                data.cpu || '—';
+
+
+            $('systemRAM').textContent =
+                `${data.usedRAM || '—'} / ${data.totalRAM || '—'}`;
+
+
+            $('systemElectron').textContent =
+                data.electron || '—';
+
+
+            $('systemChrome').textContent =
+                data.chrome || '—';
+
+
+            $('systemNode').textContent =
+                data.node || '—';
+
+
+            $('remotePort').textContent =
+                data.remotePort || '—';
+
+
+            renderIPs(
+                data.localIPs || [],
+                data.remotePort
+            );
+
+        } catch (error) {
+
+            showToast(
+                'Nie udało się pobrać informacji systemowych.',
+                'error'
+            );
+
+        }
+
+    }
+
+
+    function renderIPs(
+        ips,
+        port
+    ) {
+
+        const container =
+            $('remoteIPs');
+
+
+        if (
+            !ips ||
+            ips.length === 0
+        ) {
+
+            container.innerHTML =
+                '<div class="ip">Brak lokalnego IP</div>';
+
+            return;
+        }
+
+
+        container.innerHTML =
+            ips
+                .map(
+                    ip => `
+                        <div class="ip">
+                            http://${escapeHtml(
+                                ip
+                            )}:${escapeHtml(
+                                port || 3000
+                            )}
+                        </div>
+                    `
+                )
+                .join('');
+
+    }
+
+
+    // =========================================================
+    // BUTTON EVENTS
+    // =========================================================
+
+    $('refreshButton')
+        .addEventListener(
+            'click',
+            async () => {
+
+                await loadStatus();
+
+                if (
+                    currentSection === 'update'
+                ) {
+
+                    await loadUpdateStatus();
+
+                } else if (
+                    currentSection === 'history'
+                ) {
+
+                    await loadHistory();
+
+                } else if (
+                    currentSection === 'logs'
+                ) {
+
+                    await loadLogs();
+
+                } else if (
+                    currentSection === 'system'
+                ) {
+
+                    await loadSystem();
+                }
+
+                showToast(
+                    'Dane odświeżone.',
+                    'success'
+                );
+
+            }
+        );
+
+
+    $('closeButton')
+        .addEventListener(
+            'click',
+            () => {
+
+                if (isElectron) {
+
+                    window
+                        .electronAPI
+                        .closeAdmin();
+
+                } else {
+
+                    window.close();
+
+                }
+
+            }
+        );
+
+
+    $('openShopButton')
+        .addEventListener(
+            'click',
+            openShop
+        );
+
+
+    $('reloadShopButton')
+        .addEventListener(
+            'click',
+            reloadShop
+        );
+
+
+    $('checkInternetButton')
+        .addEventListener(
+            'click',
+            checkInternet
+        );
+
+
+    $('internetCheckButton')
+        .addEventListener(
+            'click',
+            checkInternet
+        );
+
+
+    $('kioskOpenButton')
+        .addEventListener(
+            'click',
+            openShop
+        );
+
+
+    $('kioskReloadButton')
+        .addEventListener(
+            'click',
+            reloadShop
+        );
+
+
+    $('restartButton')
+        .addEventListener(
+            'click',
+            restartApplication
+        );
+
+
+    $('kioskRestartButton')
+        .addEventListener(
+            'click',
+            restartApplication
+        );
+
+
+    $('checkUpdateButton')
+        .addEventListener(
+            'click',
+            checkForUpdate
+        );
+
+
+    $('downloadUpdateButton')
+        .addEventListener(
+            'click',
+            downloadUpdate
+        );
+
+
+    $('installUpdateButton')
+        .addEventListener(
+            'click',
+            installUpdate
+        );
+
+
+    $('historyRefreshButton')
+        .addEventListener(
+            'click',
+            loadHistory
+        );
+
+
+    $('historyClearButton')
+        .addEventListener(
+            'click',
+            clearHistory
+        );
+
+
+    $('logsRefreshButton')
+        .addEventListener(
+            'click',
+            loadLogs
+        );
+
+
+    // =========================================================
+    // INITIAL
+    // =========================================================
+
+    async function initialize() {
+
+        await loadStatus();
+
+        await loadUpdateStatus();
+
+        setInterval(
+            loadStatus,
+            10000
+        );
+
+        setInterval(
+            loadUpdateStatus,
+            5000
+        );
+
+    }
+
+
+    initialize();
+
+</script>
+
+</body>
+
+</html>

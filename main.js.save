@@ -1,0 +1,188 @@
+const { app, BrowserWindow, globalShortcut } = require('electron');
+const path = require('path');
+
+const SHOP_URL = 'https://sklep.itlabstore.pl/';
+
+let shopWindow = null;
+let adminWindow = null;
+let splashWindow = null;
+let isQuitting = false;
+
+function createSplashWindow() {
+  splashWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    show: false,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  });
+
+  splashWindow.loadFile(
+    path.join(__dirname, 'src', 'index.html')
+  );
+
+  splashWindow.once('ready-to-show', () => {
+    splashWindow.show();
+  });
+}
+
+function closeSplash() {
+  if (!splashWindow || splashWindow.isDestroyed()) {
+    return;
+  }
+
+  splashWindow.close();
+  splashWindow = null;
+}
+
+function createShopWindow() {
+  if (shopWindow && !shopWindow.isDestroyed()) {
+    shopWindow.focus();
+    return;
+  }
+
+  shopWindow = new BrowserWindow({
+    fullscreen: true,
+    kiosk: true,
+    frame: false,
+    resizable: false,
+    movable: false,
+    autoHideMenuBar: true,
+    backgroundColor: '#ffffff',
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  });
+
+  shopWindow.setMenu(null);
+
+  shopWindow.webContents.setWindowOpenHandler(() => {
+    return {
+      action: 'deny'
+    };
+  });
+
+  shopWindow.loadURL(SHOP_URL);
+
+  shopWindow.on('close', (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+    }
+  });
+
+  shopWindow.on('closed', () => {
+    shopWindow = null;
+  });
+}
+
+function createAdminWindow() {
+  console.log('Открываем админ-панель...');
+
+  if (adminWindow && !adminWindow.isDestroyed()) {
+    adminWindow.show();
+    adminWindow.focus();
+    adminWindow.moveTop();
+    return;
+  }
+
+  if (shopWindow && !shopWindow.isDestroyed()) {
+    shopWindow.setKiosk(false);
+    shopWindow.setFullScreen(false);
+  }
+
+  adminWindow = new BrowserWindow({
+    width: 1000,
+    height: 700,
+    title: 'ITLab Kiosk Admin',
+    show: false,
+    frame: true,
+    resizable: true,
+    alwaysOnTop: true,
+    backgroundColor: '#ffffff',
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  });
+
+  adminWindow.setMenu(null);
+
+  adminWindow.loadFile(
+    path.join(__dirname, 'src', 'admin.html')
+  );
+
+  adminWindow.once('ready-to-show', () => {
+    console.log('Админ-панель готова');
+    adminWindow.show();
+    adminWindow.focus();
+    adminWindow.moveTop();
+  });
+
+  adminWindow.webContents.on('did-finish-load', () => {
+    console.log('Админ-панель загружена');
+  });
+
+  adminWindow.on('closed', () => {
+    console.log('Админ-панель закрыта');
+
+    adminWindow = null;
+
+    if (shopWindow && !shopWindow.isDestroyed()) {
+      shopWindow.setFullScreen(true);
+      shopWindow.setKiosk(true);
+      shopWindow.focus();
+    }
+  });
+}
+
+function registerShortcuts() {
+  const registered = globalShortcut.register(
+    'CommandOrControl+Shift+A',
+    () => {
+      console.log('CMD/CTRL + SHIFT + A нажата');
+      createAdminWindow();
+    }
+  );
+
+  console.log(
+    'Горячая клавиша зарегистрирована:',
+    registered
+  );
+}
+
+app.whenReady().then(() => {
+  console.log('ITLab Kiosk запущен');
+
+  createSplashWindow();
+
+  registerShortcuts();
+
+  setTimeout(() => {
+    createShopWindow();
+    closeSplash();
+  }, 1500);
+});
+
+app.on('activate', () => {
+  if (!shopWindow || shopWindow.isDestroyed()) {
+    createShopWindow();
+  }
+});
+
+app.on('before-quit', () => {
+  isQuitting = true;
+});
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+});
+
+

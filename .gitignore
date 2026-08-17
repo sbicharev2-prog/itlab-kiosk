@@ -1,0 +1,10 @@
+node_modules/
+dist/
+release/
+build/
+*.dmg
+*.exe
+*.zip
+*.7z
+*.tar
+.DS_Store

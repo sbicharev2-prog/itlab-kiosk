@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>ITLAB STORE — Admin Access</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    height: 100%;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at top right,
+            #24324a 0%,
+            #10151f 45%,
+            #080b10 100%
+        );
+
+    color: white;
+
+    overflow: hidden;
+}
+
+.container {
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+
+    width: 390px;
+
+    padding: 38px;
+
+    border-radius: 24px;
+
+    background:
+        rgba(20, 26, 37, 0.96);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 30px 80px
+        rgba(0,0,0,0.55);
+
+    text-align: center;
+
+    animation:
+        cardIn
+        .35s
+        ease;
+}
+
+@keyframes cardIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.logo {
+
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 20px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #cbd5e1
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #111827;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    box-shadow:
+        0 10px 30px
+        rgba(255,255,255,.12);
+}
+
+h1 {
+
+    margin: 0;
+
+    font-size: 25px;
+
+    letter-spacing: -.5px;
+}
+
+.subtitle {
+
+    margin-top: 8px;
+
+    color: #8e99aa;
+
+    font-size: 14px;
+}
+
+.pin {
+
+    width: 100%;
+
+    margin-top: 28px;
+
+    padding: 17px;
+
+    border-radius: 14px;
+
+    border:
+        1px solid
+        #303949;
+
+    outline: none;
+
+    background:
+        #0c1119;
+
+    color: white;
+
+    font-size: 24px;
+
+    text-align: center;
+
+    letter-spacing: 10px;
+
+    transition:
+        border .2s,
+        box-shadow .2s;
+}
+
+.pin:focus {
+
+    border-color: #64748b;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(100,116,139,.15);
+}
+
+button {
+
+    width: 100%;
+
+    margin-top: 18px;
+
+    padding: 16px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #dce3ec
+        );
+
+    color: #111827;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s,
+        opacity .15s;
+}
+
+button:hover {
+
+    transform: translateY(-1px);
+}
+
+button:active {
+
+    transform: scale(.98);
+}
+
+.error {
+
+    min-height: 20px;
+
+    margin-top: 14px;
+
+    color: #ff6b6b;
+
+    font-size: 13px;
+}
+
+.footer {
+
+    margin-top: 25px;
+
+    color: #596579;
+
+    font-size: 11px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="logo">
+            IT
+        </div>
+
+        <h1>
+            ITLAB STORE
+        </h1>
+
+        <div class="subtitle">
+            Panel administratora
+        </div>
+
+        <input
+            id="pin"
+            class="pin"
+            type="password"
+            inputmode="numeric"
+            maxlength="4"
+            autocomplete="off"
+            placeholder="••••"
+        >
+
+        <button id="loginButton">
+            ZALOGUJ SIĘ
+        </button>
+
+        <div
+            id="error"
+            class="error"
+        ></div>
+
+        <div class="footer">
+            Administrator access
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const CORRECT_PIN = '0808';
+
+const pinInput =
+    document.getElementById('pin');
+
+const loginButton =
+    document.getElementById('loginButton');
+
+const error =
+    document.getElementById('error');
+
+
+// ============================================================
+// CHECK ELECTRON API
+// ============================================================
+
+function checkElectronAPI() {
+
+    if (
+        !window.electronAPI ||
+        typeof window.electronAPI.openAdmin !== 'function'
+    ) {
+
+        error.textContent =
+            'Ошибка Electron API. Проверь preload.js';
+
+        console.error(
+            'electronAPI is not available',
+            window.electronAPI
+        );
+
+        return false;
+    }
+
+    return true;
+}
+
+
+// ============================================================
+// LOGIN
+// ============================================================
+
+function login() {
+
+    const pin =
+        pinInput.value.trim();
+
+    error.textContent = '';
+
+    if (pin.length !== 4) {
+
+        error.textContent =
+            'Введите 4 цифры';
+
+        pinInput.focus();
+
+        return;
+    }
+
+    if (pin !== CORRECT_PIN) {
+
+        error.textContent =
+            'Неверный PIN-код';
+
+        pinInput.value = '';
+
+        pinInput.focus();
+
+        return;
+    }
+
+    if (!checkElectronAPI()) {
+        return;
+    }
+
+    loginButton.disabled = true;
+
+    loginButton.textContent =
+        'ОТКРЫТИЕ...';
+
+    try {
+
+        window.electronAPI.openAdmin();
+
+    } catch (e) {
+
+        console.error(e);
+
+        error.textContent =
+            'Ошибка открытия панели';
+
+        loginButton.disabled = false;
+
+        loginButton.textContent =
+            'ЗАЛОГИНИТЬСЯ';
+    }
+}
+
+
+// ============================================================
+// BUTTON
+// ============================================================
+
+loginButton.addEventListener(
+    'click',
+    login
+);
+
+
+// ============================================================
+// ENTER
+// ============================================================
+
+pinInput.addEventListener(
+    'keydown',
+    (event) => {
+
+        if (event.key === 'Enter') {
+
+            event.preventDefault();
+
+            login();
+        }
+    }
+);
+
+
+// ============================================================
+// ONLY NUMBERS
+// ============================================================
+
+pinInput.addEventListener(
+    'input',
+    () => {
+
+        pinInput.value =
+            pinInput.value
+                .replace(/\D/g, '')
+                .slice(0, 4);
+    }
+);
+
+
+// ============================================================
+// AUTO FOCUS
+// ============================================================
+
+window.addEventListener(
+    'load',
+    () => {
+
+        pinInput.focus();
+
+        checkElectronAPI();
+    }
+);
+
+</script>
+
+</body>
+
+</html>
